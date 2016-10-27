@@ -120,6 +120,10 @@ $burnerjson = json_encode($burner);
   </form>
 </div>
 <div id="tempChart" style="height: 700px; width: 100%;"></div>
+<div>
+<?php echo $burnerjson; ?>
+<?php echo $tempsjson; ?>
+</div>
 </body>
 <footer>
   <script type="text/javascript">
@@ -149,7 +153,7 @@ $burnerjson = json_encode($burner);
             type: "column",
             xValueType: "dateTime",
             color: "rgba(255,0,0,.5)",
-            dataPoints: <?php echo $burnerjson ?>
+            dataPoints: <?php echo $burnerjson; ?>
           },
           {
             xValueFormatString: "DDD H:mm",
