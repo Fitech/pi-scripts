@@ -32,12 +32,18 @@ else
 }
 
 $currenttime= date("Y-m-d H:i:s");
+
 $startOfRange = date('Y-m-d H:i:s', strtotime($dateRange, strtotime($currenttime)));
+$oneDayAgo =  date('Y-m-d H:i:s', strtotime("-1 day", strtotime($currenttime)));
+$twoDaysAgo =  date('Y-m-d H:i:s', strtotime("-2 day", strtotime($currenttime)));
+$threeDaysAgo =  date('Y-m-d H:i:s', strtotime("-3 day", strtotime($currenttime)));
+$fourDaysAgo =  date('Y-m-d H:i:s', strtotime("-4 day", strtotime($currenttime)));
 
 mysql_connect(localhost,$username,$password);
 @mysql_select_db($database) or die( "Unable to select database");
 
 $query="SELECT * FROM tempLog WHERE datetime >'" . $startOfRange . "'";
+
 $result=mysql_query($query);
 
 $num=mysql_numrows($result);
@@ -52,6 +58,10 @@ $i=0;
 $readingAB = "A";
 $tempA = 0;
 $tempB = 0;
+$todayTot = 0;
+$oneDayAgoTot = 0;
+$twoDaysAgoTot = 0;
+$threeDaysAgoTot = 0;
 
 while ($i < $num)
 {
@@ -96,13 +106,33 @@ while ($i < $num)
     }
     $nextRead = "A";
   }
-  
+  if ($dateAndBurner[y] == 200) {
+    if ($datetime >= $oneDayAgo ) {
+      $todayTot += 3;
+    }
+    else if ($datetime >= $twoDaysAgo && $datetime < $oneDayAgo) {
+      $oneDayAgoTot += 3;
+    }
+    else if ($datetime >= $threeDaysAgo && $datetime < $twoDaysAgo) {
+      $twoDaysAgoTot += 3;
+    }
+    else if ($datetime >= $fourDaysAgo && $datetime < $threeDaysAgo) {
+      $threeDaysAgoTot += 3;
+    }
+  }
   $readingAB = $nextRead;
   $burner[$i]=$dateAndBurner;
 	$tempValues[$i]=$dateAndTemps;
 	$i++;
 }
-
+echo "Last 24 Hours: ", $todayTot;
+echo "<br>";
+echo "Yesterday Total: ", $oneDayAgoTot;
+echo "<br>";
+echo "Two Days Ago Total: ", $twoDaysAgoTot;
+echo "<br>";
+echo "Three Days Ago Total: ", $threeDaysAgoTot;
+echo "<br>";
 $tempsjson = json_encode($tempValues);
 $burnerjson = json_encode($burner);
 ?>
@@ -120,10 +150,6 @@ $burnerjson = json_encode($burner);
   </form>
 </div>
 <div id="tempChart" style="height: 700px; width: 100%;"></div>
-<div>
-<?php echo $burnerjson; ?>
-<?php echo $tempsjson; ?>
-</div>
 </body>
 <footer>
   <script type="text/javascript">

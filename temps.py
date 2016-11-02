@@ -6,7 +6,9 @@ import time
 import MySQLdb
 from datetime import datetime, date
 from time import strftime
+from mixpanel import Mixpanel
 
+mp = Mixpanel('60dff8e0ce93d4470ab7ff10bc9d5142')
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -49,15 +51,21 @@ while True:
 		tempA = str(tempAf)
 		print(tempA)
 		if (tempAf > tempBf):
-			burnerOn = 1
+			burnerOn = 'TRUE'
 		else:
-			burnerOn = 0
+			burnerOn = 'FALSE'
 
 		nextRead = "B"
 		datetimeWrite = (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))
 		print datetimeWrite
 		sql = ("""INSERT INTO tempLog (datetime,temperature,burner_on) VALUES (%s,%s,%s)""",(datetimeWrite,tempA,burnerOn))
 		print "temp A"
+
+		mp.track('pi', 'Temp Reading', {
+		    'Temperature': tempA,
+		    'Burner': burnerOn
+		})
+		
 		print sql
 		try:
 			print "Writing to database..."
@@ -78,15 +86,21 @@ while True:
 		tempB = str(tempBf)
 		print(tempB)
 		if (tempBf > tempAf):
-			burnerOn = 1
+			burnerOn = 'TRUE'
 		else:
-			burnerOn = 0
+			burnerOn = 'FALSE'
 
 		nextRead = "A"
 		datetimeWrite = (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))
 		print datetimeWrite
 		sql = ("""INSERT INTO tempLog (datetime,temperature,burner_on) VALUES (%s,%s,%s)""",(datetimeWrite,tempB,burnerOn))
 		print "temp B"
+
+		mp.track('pi', 'Temp Reading', {
+		    'Temperature': tempB,
+		    'Burner': burnerOn
+		})
+
 		print sql
 		try:
 			print "Writing to database..."
